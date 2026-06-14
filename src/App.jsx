@@ -1,14 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CONCERNS, PRODUCTS } from './data/productsData';
 import Card from './components/Card';
 import ResultCard from './components/ResultCard';
 import ProgressBar from './components/ProgressBar';
 
+// 자연어 분석용 키워드 매핑 사전
+const NLP_DICTIONARY = {
+  fatigue: ['피곤', '피로', '지친', '에너지', '힘들', '아침', '활력', '쉬고', '졸리', '무기력', '체력', '만성', '번아웃'],
+  liver: ['간', '술', '회식', '숙취', '독소', '해독', '알코올', '음주', '황달', '침침'],
+  diet: ['다이어트', '살', '체지방', '몸무게', '비만', '단백질', '근육', '체중', '운동', '식단', '굶', '칼로리'],
+  skin: ['피부', '주름', '노화', '탄력', '건조', '앰플', '화장품', '미백', '기미', '콜라겐', '피부톤', '스킨케어'],
+  gut: ['장', '소화', '더부룩', '가스', '변비', '배변', '유산균', '소화불량', '설사', '위', '속이', '배가']
+};
+
 function App() {
+  const [inputText, setInputText] = useState('');
   const [selectedConcerns, setSelectedConcerns] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [autoDetectedCount, setAutoDetectedCount] = useState(0);
+
+  // 사용자가 직접 입력한 텍스트 기반 자연어 매핑 로직
+  useEffect(() => {
+    if (!inputText.trim()) {
+      setAutoDetectedCount(0);
+      return;
+    }
+
+    const detected = [];
+    const text = inputText.toLowerCase();
+
+    Object.entries(NLP_DICTIONARY).forEach(([concernId, keywords]) => {
+      // 키워드 중 하나라도 포함되어 있으면 감지
+      const hasKeyword = keywords.some(keyword => text.includes(keyword));
+      if (hasKeyword) {
+        detected.push(concernId);
+      }
+    });
+
+    // 기존의 수동 선택값과 자동 분석된 값을 병합 (수동 선택 보존을 위해)
+    // 여기서는 자연어 입력에 따라 실시간 반영
+    setSelectedConcerns(prev => {
+      // 주관식 텍스트로 감지된 값들로 업데이트하되, 주관식이 빈칸이 아닐 때는 감지된 값 중심으로 재구성
+      const merged = Array.from(new Set([...detected]));
+      return merged;
+    });
+
+    setAutoDetectedCount(detected.length);
+  }, [inputText]);
 
   // 고민 선택/해제 핸들러
   const handleConcernClick = (id) => {
@@ -44,6 +84,7 @@ function App() {
   // 재진단 핸들러
   const handleReset = () => {
     setSelectedConcerns([]);
+    setInputText('');
     setShowResults(false);
     setRecommendedProducts([]);
   };
@@ -58,7 +99,6 @@ function App() {
             alt="Synergy WorldWide" 
             className="brand-logo"
             onError={(e) => {
-              // 백업 플랜: SVG 로고 실패 시 심플 텍스트 처리
               e.target.style.display = 'none';
               e.target.parentNode.innerHTML += '<span style="font-size:1.3rem;font-weight:800;color:#001E61;font-family:Outfit">SYNERGY</span>';
             }}
@@ -72,9 +112,9 @@ function App() {
               background: 'none', 
               border: 'none', 
               color: '#001E61', 
-              fontWeight: '600', 
+              fontWeight: '700', 
               cursor: 'pointer',
-              fontSize: '0.9rem' 
+              fontSize: '1rem' 
             }}
           >
             처음으로
@@ -89,8 +129,8 @@ function App() {
       {isAnalyzing && (
         <div className="loader-container" style={{ margin: 'auto' }}>
           <div className="spinner"></div>
-          <h2 style={{ color: '#001E61', fontFamily: 'Outfit', fontWeight: '800' }}>체질 및 건강 데이터 분석 중...</h2>
-          <p style={{ color: '#666', marginTop: '0.5rem' }}>선택하신 증상에 최적화된 성분 조합을 구성하고 있습니다.</p>
+          <h2 style={{ color: '#001E61', fontFamily: 'Outfit', fontWeight: '800', fontSize: '1.8rem' }}>체질 및 건강 데이터 분석 중...</h2>
+          <p style={{ color: '#555', marginTop: '0.8rem', fontSize: '1.15rem' }}>선택하신 증상에 최적화된 성분 조합을 구성하고 있습니다.</p>
         </div>
       )}
 
@@ -101,21 +141,43 @@ function App() {
             <span className="hero-tag">My Personal Solution</span>
             <h1 className="hero-title">당신의 몸에 딱 맞는<br />1:1 맞춤형 영양 시너지를 찾아보세요</h1>
             <p className="hero-subtitle">
-              현재 가장 고민이 되는 증상이나 개선이 필요한 몸 상태를 모두 선택해 주세요. 
+              불편하신 점을 주관식으로 직접 적거나 아래 건강 고민 카드 중에서 선택해 보세요.
               의·과학적 R&D를 바탕으로 검증된 영양 솔루션을 매칭해 드립니다.
             </p>
           </section>
 
           <main className="app-container">
-            <div className="concerns-grid">
-              {CONCERNS.map((concern) => (
-                <Card 
-                  key={concern.id}
-                  {...concern}
-                  isSelected={selectedConcerns.includes(concern.id)}
-                  onClick={handleConcernClick}
-                />
-              ))}
+            {/* 직접 쓰기 인풋 필드 섹션 */}
+            <div className="text-diagnosis-section">
+              <h2 className="section-title">✍️ 어디가 어떻게 안 좋으신가요?</h2>
+              <p className="section-desc">
+                예: "요즘 야근이 잦아 술도 자주 먹고 아침에 너무 피곤해요. 살도 찌는 것 같아 다이어트도 필요해요."
+              </p>
+              <textarea
+                className="diagnosis-textarea"
+                placeholder="불편하신 증상을 자유롭게 입력하시면 실시간으로 관련 건강 고민을 감지하여 분석합니다..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+              />
+              {autoDetectedCount > 0 && (
+                <div className="nlp-badge">
+                  💡 입력하신 텍스트에서 <strong>{autoDetectedCount}개</strong>의 맞춤 건강 고민 카드가 실시간 감지되어 자동 선택되었습니다.
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: '3rem' }}>
+              <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem' }}>📋 건강 고민 카테고리 (중복 선택 가능)</h2>
+              <div className="concerns-grid">
+                {CONCERNS.map((concern) => (
+                  <Card 
+                    key={concern.id}
+                    {...concern}
+                    isSelected={selectedConcerns.includes(concern.id)}
+                    onClick={handleConcernClick}
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="cta-container">
@@ -128,8 +190,8 @@ function App() {
                 <span>→</span>
               </button>
               {selectedConcerns.length === 0 && (
-                <p style={{ color: '#A0AEC0', fontSize: '0.85rem', marginTop: '0.8rem' }}>
-                  최소 1개 이상의 고민을 선택해 주세요.
+                <p style={{ color: '#A0AEC0', fontSize: '0.95rem', marginTop: '0.8rem' }}>
+                  증상을 적거나 최소 1개 이상의 고민을 선택해 주세요.
                 </p>
               )}
             </div>
@@ -143,8 +205,8 @@ function App() {
           <div className="results-header">
             <span className="hero-tag" style={{ color: '#1890FF' }}>YOUR WELLNESS COMBINATION</span>
             <h1 className="hero-title">당신만을 위한 맞춤 처방 솔루션</h1>
-            <p className="hero-subtitle" style={{ maxWidth: '700px' }}>
-              선택하신 고민({selectedConcerns.map(c => CONCERNS.find(item => item.id === c)?.title.split(' ')[0]).join(', ')})을 케어하기 위해 
+            <p className="hero-subtitle" style={{ maxWidth: '750px' }}>
+              선택/감지된 고민({selectedConcerns.map(c => CONCERNS.find(item => item.id === c)?.title.split(' ')[0]).join(', ')})을 케어하기 위해 
               우선적으로 섭취가 필요한 유효 성분과 추천 제품 조합입니다.
             </p>
           </div>
@@ -168,7 +230,7 @@ function App() {
               체질 진단 결과에 따라 추가적인 복용 팁이나 구매/비즈니스 회원 혜택이 궁금하신가요? 
               전문적인 헬스 가이드를 제공하는 시너지 코리아의 공인 멤버와 직접 연결해 보세요.
             </p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '1.2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <a 
                 href="https://www.synergyworldwide.com/KR/ko-KR/member-lookup" 
                 target="_blank" 
@@ -192,15 +254,15 @@ function App() {
       {/* 푸터 */}
       <footer style={{ 
         marginTop: 'auto', 
-        padding: '2rem', 
+        padding: '2.5rem', 
         backgroundColor: '#001E61', 
         color: 'rgba(255,255,255,0.7)', 
-        fontSize: '0.85rem',
+        fontSize: '0.95rem',
         textAlign: 'center',
         borderTop: '1px solid rgba(255,255,255,0.1)'
       }}>
         <p>© 2026 Synergy WorldWide Korea. All Rights Reserved. | KDSA 직접판매공제조합 가입 회원사</p>
-        <p style={{ fontSize: '0.75rem', marginTop: '0.5rem', opacity: 0.6 }}>본 웹사이트는 맞춤형 제품 추천 서비스를 시뮬레이션하기 위한 데모 플랫폼입니다.</p>
+        <p style={{ fontSize: '0.8rem', marginTop: '0.5rem', opacity: 0.6 }}>본 웹사이트는 맞춤형 제품 추천 서비스를 시뮬레이션하기 위한 데모 플랫폼입니다.</p>
       </footer>
     </div>
   );
