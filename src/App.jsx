@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CONCERNS, PRODUCTS } from './data/productsData';
+import { CONCERNS, PRODUCTS, PACKS } from './data/productsData';
 import Card from './components/Card';
 import ResultCard from './components/ResultCard';
 import ProgressBar from './components/ProgressBar';
@@ -19,6 +19,7 @@ function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [recommendedPack, setRecommendedPack] = useState(null); // 최우선 처방 패키지
   const [autoDetectedCount, setAutoDetectedCount] = useState(0);
 
   // --- 유비오맥파 시뮬레이터 상태 ---
@@ -69,17 +70,33 @@ function App() {
     // AI 진단 분석 로딩 시뮬레이션 (1.5초)
     setTimeout(() => {
       const concernsToUse = macpaOverride ? macpaOverride.concerns : selectedConcerns;
+      const dataToUse = macpaOverride ? macpaOverride.data : null;
       
-      // 선택된 모든 고민에 연관된 고유 제품들 필터링
+      // 1. 단품 추천 필터링
       const matched = PRODUCTS.filter(product => 
         product.matchingConcerns.some(concern => concernsToUse.includes(concern))
       );
-      
       setRecommendedProducts(matched);
+
+      // 2. 패키지(원팩 / 메가팩) 분기 판단 알고리즘
+      let selectedPack = null;
+      const isSevereVascular = dataToUse && dataToUse.vascular >= 5;
+      const isSevereStress = dataToUse && (dataToUse.stress >= 75 || dataToUse.fatigue >= 75);
+      const hasManyConcerns = concernsToUse.length >= 3;
+
+      // 고민이 3개 이상이거나, 기기 데이터 수치가 심각(스트레스 75% 이상, 혈관 5단계 이상)인 경우 메가팩 추천
+      if (hasManyConcerns || isSevereVascular || isSevereStress) {
+        selectedPack = PACKS.find(p => p.id === 'megapack');
+      } else {
+        // 그 외에는 원팩 기본 제안
+        selectedPack = PACKS.find(p => p.id === 'onepack');
+      }
+      setRecommendedPack(selectedPack);
+
       setIsAnalyzing(false);
       setShowResults(true);
-      if (macpaOverride) {
-        setMacpaData(macpaOverride.data);
+      if (dataToUse) {
+        setMacpaData(dataToUse);
       }
       
       // 결과 화면으로 부드럽게 스크롤
@@ -91,22 +108,17 @@ function App() {
   const handleSimulatorSubmit = () => {
     setIsSimulatorOpen(false);
     
-    // 가상 데이터 기반 매핑 로직 산정
     const autoConcerns = [];
-    // 1. 스트레스 60% 이상 또는 피로도 60% 이상 -> fatigue
     if (simStress >= 60 || simFatigue >= 60) {
       autoConcerns.push('fatigue');
     }
-    // 2. 혈관 단계가 4단계 이상 -> liver (해독 및 혈관대사 케어)
     if (simVascular >= 4) {
       autoConcerns.push('liver');
     }
-    // 3. 자율신경 극도 불균형 가정 -> 장 건강(gut) 연계
     if (simStress >= 75) {
       autoConcerns.push('gut');
     }
 
-    // 데이터 구조 생성
     const resultObj = {
       concerns: autoConcerns.length > 0 ? autoConcerns : ['fatigue'],
       data: {
@@ -116,7 +128,6 @@ function App() {
       }
     };
 
-    // 로컬 선택 해제 및 시뮬레이터 데이터 입력 처리
     setSelectedConcerns(resultObj.concerns);
     handleAnalyze(resultObj);
   };
@@ -127,6 +138,7 @@ function App() {
     setInputText('');
     setShowResults(false);
     setRecommendedProducts([]);
+    setRecommendedPack(null);
     setMacpaData(null);
   };
 
@@ -263,20 +275,20 @@ function App() {
               <div className="macpa-metrics-grid">
                 <div className="macpa-metric-card">
                   <span className="metric-label">자율신경 스트레스 지수</span>
-                  <span className="metric-value" style={{ color: macpaData.stress >= 60 ? '#E53E3E' : '#2B6CB0' }}>
-                    {macpaData.stress}% {macpaData.stress >= 60 ? '(높음)' : '(보통)'}
+                  <span className="metric-value" style={{ color: macpaData.stress >= 75 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.stress}% {macpaData.stress >= 75 ? '(경고)' : (macpaData.stress >= 60 ? '(주의)' : '(보통)')}
                   </span>
                 </div>
                 <div className="macpa-metric-card">
                   <span className="metric-label">누적 피로도</span>
-                  <span className="metric-value" style={{ color: macpaData.fatigue >= 60 ? '#E53E3E' : '#2B6CB0' }}>
-                    {macpaData.fatigue}% {macpaData.fatigue >= 60 ? '(주의)' : '(안정)'}
+                  <span className="metric-value" style={{ color: macpaData.fatigue >= 70 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.fatigue}% {macpaData.fatigue >= 70 ? '(경고)' : '(안정)'}
                   </span>
                 </div>
                 <div className="macpa-metric-card">
                   <span className="metric-label">말초 혈관 탄성 단계</span>
-                  <span className="metric-value" style={{ color: macpaData.vascular >= 4 ? '#E53E3E' : '#2B6CB0' }}>
-                    {macpaData.vascular}단계 (총 7단계) {macpaData.vascular >= 4 ? '(경화 진행)' : '(양호)'}
+                  <span className="metric-value" style={{ color: macpaData.vascular >= 5 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.vascular}단계 (총 7단계) {macpaData.vascular >= 5 ? '(위험)' : (macpaData.vascular >= 4 ? '(경화)' : '(양호)')}
                   </span>
                 </div>
               </div>
@@ -288,22 +300,67 @@ function App() {
             <h1 className="hero-title">당신만을 위한 맞춤 처방 솔루션</h1>
             <p className="hero-subtitle" style={{ maxWidth: '750px' }}>
               {macpaData 
-                ? '유비오맥파 장치 측정 데이터 분석에 의거하여 도출된 혈행 개선 및 활력 충전 솔루션입니다.'
-                : `선택/감지된 고민(${selectedConcerns.map(c => CONCERNS.find(item => item.id === c)?.title.split(' ')[0]).join(', ')})을 케어하기 위해 우선적으로 섭취가 필요한 유효 성분과 추천 제품 조합입니다.`
+                ? '유비오맥파 장치 측정 결과와 체질 상태를 복합 분석하여 설계된 종합 솔루션입니다.'
+                : `선택/감지된 고민(${selectedConcerns.map(c => CONCERNS.find(item => item.id === c)?.title.split(' ')[0]).join(', ')})에 최적화된 처방 구성입니다.`
               }
             </p>
           </div>
 
-          <div className="results-grid">
-            {recommendedProducts.length > 0 ? (
-              recommendedProducts.map((product) => (
-                <ResultCard key={product.id} {...product} />
-              ))
-            ) : (
-              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem 0' }}>
-                <p style={{ color: '#718096' }}>추천 가능한 솔루션 제품이 존재하지 않습니다.</p>
+          {/* 1. 주력 추천 패키지 솔루션 (원팩 / 메가팩) */}
+          {recommendedPack && (
+            <section className="special-package-section" style={{ marginBottom: '4rem' }}>
+              <div className="package-card-premium">
+                <div className="package-badge">🏆 최우선 추천 패키지 처방</div>
+                <div className="package-content-wrapper">
+                  <div className="package-image-container">
+                    <img src={recommendedPack.imageUrl} alt={recommendedPack.name} className="package-image" />
+                  </div>
+                  <div className="package-text-details">
+                    <h2 className="package-title">{recommendedPack.name}</h2>
+                    <p className="package-subtitle">{recommendedPack.subName} | {recommendedPack.tagline}</p>
+                    <p className="package-desc">{recommendedPack.description}</p>
+                    
+                    <div className="package-components">
+                      <span className="component-label">📦 패키지 구성 제품:</span>
+                      <div className="component-tags">
+                        {recommendedPack.components.map((c, idx) => (
+                          <span key={idx} className="comp-tag">{c}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <ul className="package-benefits">
+                      {recommendedPack.benefits.map((b, idx) => (
+                        <li key={idx} className="benefit-item">{b}</li>
+                      ))}
+                    </ul>
+
+                    <div className="package-bottom-row" style={{ marginTop: '2rem' }}>
+                      <span style={{ fontSize: '1rem', color: '#666' }}>💡 복용법: <strong>{recommendedPack.usage}</strong></span>
+                      <a href={recommendedPack.link} target="_blank" rel="noopener noreferrer" className="package-cta-btn">
+                        공식 스토어에서 패키지 보기
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+            </section>
+          )}
+
+          {/* 2. 단품 추천 솔루션 목록 */}
+          <div>
+            <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.7rem' }}>💊 개별 집중 케어 권장 제품</h2>
+            <div className="results-grid">
+              {recommendedProducts.length > 0 ? (
+                recommendedProducts.map((product) => (
+                  <ResultCard key={product.id} {...product} />
+                ))
+              ) : (
+                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem 0' }}>
+                  <p style={{ color: '#718096' }}>추천 가능한 솔루션 제품이 존재하지 않습니다.</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 상담 및 가입 연동 CTA 배너 */}

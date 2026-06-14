@@ -10,7 +10,7 @@ export const CONCERNS = [
   {
     id: "liver",
     title: "간 해독 및 숙취/독소 배출",
-    description: "잦은 야근 and 회식으로 간 건강 관리가 필요하신 분",
+    description: "잦은 야근과 회식으로 간 건강 관리가 필요하신 분",
     icon: "🌱",
     symptoms: ["만성 피로", "눈의 충혈/피로", "숙취 해소 부진"],
     targetIngredients: ["실리마린(밀크씨슬)", "엽산", "마그네슘"]
@@ -143,5 +143,40 @@ export const PRODUCTS = [
     matchingConcerns: ["liver", "gut"],
     usage: "물 500ml에 적정량(1티스푼 가량)을 희석하여 수시로 마십니다.",
     link: "https://www.synergyworldwide.com/KR/ko-KR/Shop/Product/truegreenpluslime-np#KR97404"
+  }
+];
+
+export const PACKS = [
+  {
+    id: "onepack",
+    name: "시너지 원팩",
+    subName: "One Pack (기본 건강 시너지)",
+    tagline: "활력과 면역, 기초 대사를 한 번에 잡는 스타터 팩",
+    imageUrl: "https://usprod.synergyworldwide.com/globalassets/synergy-products-catalog/products/kr-c329dfb57e8343a8be0d5d1c874cd082.webp?v=110325013941",
+    description: "시너지의 대표 베스트셀러 프로알지-9+와 기초 영양 및 면역 균형을 잡는 필수 비타민군(시너비트, 시너뮨)이 유기적으로 조화된 복합 기본 영양 패키지입니다.",
+    components: ["프로알지-9+", "시너비트", "시너뮨"],
+    benefits: [
+      "심혈관 건강 및 기초 에너지 생성 극대화",
+      "활성산소 제거 및 유해 인자 방어 면역 향상",
+      "바쁜 현대인의 간결하고 명확한 1달 기초 필수 영양 공급"
+    ],
+    usage: "각 구성품 매뉴얼에 맞춰 하루 1포씩 간편하게 섭취하십시오.",
+    link: "https://www.synergyworldwide.com/KR/ko-KR/Shop/all-packs"
+  },
+  {
+    id: "megapack",
+    name: "시너지 메가팩",
+    subName: "Mega Pack (전신 디톡스 & 다이어트 올인원)",
+    tagline: "혈관 청소부터 장내 환경 리셋까지 전신 대사 케어 프로그램",
+    imageUrl: "https://usprod.synergyworldwide.com/globalassets/allproducts.jpg",
+    description: "혈액 순환을 개선하는 프로알지-9+ 대량 공급과 더불어 고단백 식단을 채워주는 맥시멈 프로틴, 장내 환경을 정화하는 컨트롤 FOS 및 노폐물을 중화 배출하는 트루그린, 비프라임 등이 총집결한 4~6주 최고급 전신 리뉴얼 해독 프로그램입니다.",
+    components: ["프로알지-9+", "시너비트", "시너뮨", "맥시멈 프로틴", "컨트롤 FOS", "트루그린", "바이타팩", "비프라임"],
+    benefits: [
+      "전신 혈액 순환 개선 및 체내 축적된 노폐물/독소 집중 배출",
+      "식이섬유(FOS)와 유산균을 통한 근본적 장 건강 리부팅",
+      "근육 유실 없이 체지방 중심의 건강한 다이어트 및 기초대사량 증가"
+    ],
+    usage: "전문 시너지 팀 멤버의 가이드에 따라 주차별 집중 섭취 플랜으로 수행하십시오.",
+    link: "https://www.synergyworldwide.com/KR/ko-KR/Shop/all-packs"
   }
 ];
