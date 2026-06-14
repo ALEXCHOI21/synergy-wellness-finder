@@ -1,0 +1,209 @@
+import React, { useState } from 'react';
+import { CONCERNS, PRODUCTS } from './data/productsData';
+import Card from './components/Card';
+import ResultCard from './components/ResultCard';
+import ProgressBar from './components/ProgressBar';
+
+function App() {
+  const [selectedConcerns, setSelectedConcerns] = useState([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+
+  // 고민 선택/해제 핸들러
+  const handleConcernClick = (id) => {
+    setSelectedConcerns((prev) => 
+      prev.includes(id) 
+        ? prev.filter((item) => item !== id) 
+        : [...prev, id]
+    );
+  };
+
+  // 맞춤 솔루션 계산 및 결과창 이동
+  const handleAnalyze = () => {
+    if (selectedConcerns.length === 0) return;
+    
+    setIsAnalyzing(true);
+    
+    // AI 진단 분석 로딩 시뮬레이션 (1.5초)
+    setTimeout(() => {
+      // 선택된 모든 고민에 연관된 고유 제품들 필터링
+      const matched = PRODUCTS.filter(product => 
+        product.matchingConcerns.some(concern => selectedConcerns.includes(concern))
+      );
+      
+      setRecommendedProducts(matched);
+      setIsAnalyzing(false);
+      setShowResults(true);
+      
+      // 결과 화면으로 부드럽게 스크롤
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 1500);
+  };
+
+  // 재진단 핸들러
+  const handleReset = () => {
+    setSelectedConcerns([]);
+    setShowResults(false);
+    setRecommendedProducts([]);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {/* 공식 브랜드 헤더 */}
+      <header className="brand-header">
+        <div className="logo-container">
+          <img 
+            src="https://usprod.synergyworldwide.com/globalassets/apac/apac-header/logo_new.svg" 
+            alt="Synergy WorldWide" 
+            className="brand-logo"
+            onError={(e) => {
+              // 백업 플랜: SVG 로고 실패 시 심플 텍스트 처리
+              e.target.style.display = 'none';
+              e.target.parentNode.innerHTML += '<span style="font-size:1.3rem;font-weight:800;color:#001E61;font-family:Outfit">SYNERGY</span>';
+            }}
+          />
+          <span className="brand-badge">WELLNESS FINDER</span>
+        </div>
+        <div>
+          <button 
+            onClick={handleReset}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: '#001E61', 
+              fontWeight: '600', 
+              cursor: 'pointer',
+              fontSize: '0.9rem' 
+            }}
+          >
+            처음으로
+          </button>
+        </div>
+        
+        {/* 상단 진행률 프로그레스바 */}
+        <ProgressBar currentStep={showResults ? 2 : (selectedConcerns.length > 0 ? 1 : 0)} totalSteps={2} />
+      </header>
+
+      {/* 분석 중 로딩 스피너 */}
+      {isAnalyzing && (
+        <div className="loader-container" style={{ margin: 'auto' }}>
+          <div className="spinner"></div>
+          <h2 style={{ color: '#001E61', fontFamily: 'Outfit', fontWeight: '800' }}>체질 및 건강 데이터 분석 중...</h2>
+          <p style={{ color: '#666', marginTop: '0.5rem' }}>선택하신 증상에 최적화된 성분 조합을 구성하고 있습니다.</p>
+        </div>
+      )}
+
+      {/* 1단계: 고민 선택 화면 */}
+      {!isAnalyzing && !showResults && (
+        <>
+          <section className="hero-section">
+            <span className="hero-tag">My Personal Solution</span>
+            <h1 className="hero-title">당신의 몸에 딱 맞는<br />1:1 맞춤형 영양 시너지를 찾아보세요</h1>
+            <p className="hero-subtitle">
+              현재 가장 고민이 되는 증상이나 개선이 필요한 몸 상태를 모두 선택해 주세요. 
+              의·과학적 R&D를 바탕으로 검증된 영양 솔루션을 매칭해 드립니다.
+            </p>
+          </section>
+
+          <main className="app-container">
+            <div className="concerns-grid">
+              {CONCERNS.map((concern) => (
+                <Card 
+                  key={concern.id}
+                  {...concern}
+                  isSelected={selectedConcerns.includes(concern.id)}
+                  onClick={handleConcernClick}
+                />
+              ))}
+            </div>
+
+            <div className="cta-container">
+              <button 
+                className="btn-primary" 
+                onClick={handleAnalyze}
+                disabled={selectedConcerns.length === 0}
+              >
+                <span>맞춤 영양 솔루션 분석하기</span>
+                <span>→</span>
+              </button>
+              {selectedConcerns.length === 0 && (
+                <p style={{ color: '#A0AEC0', fontSize: '0.85rem', marginTop: '0.8rem' }}>
+                  최소 1개 이상의 고민을 선택해 주세요.
+                </p>
+              )}
+            </div>
+          </main>
+        </>
+      )}
+
+      {/* 2단계: 결과 화면 */}
+      {!isAnalyzing && showResults && (
+        <main className="app-container results-section">
+          <div className="results-header">
+            <span className="hero-tag" style={{ color: '#1890FF' }}>YOUR WELLNESS COMBINATION</span>
+            <h1 className="hero-title">당신만을 위한 맞춤 처방 솔루션</h1>
+            <p className="hero-subtitle" style={{ maxWidth: '700px' }}>
+              선택하신 고민({selectedConcerns.map(c => CONCERNS.find(item => item.id === c)?.title.split(' ')[0]).join(', ')})을 케어하기 위해 
+              우선적으로 섭취가 필요한 유효 성분과 추천 제품 조합입니다.
+            </p>
+          </div>
+
+          <div className="results-grid">
+            {recommendedProducts.length > 0 ? (
+              recommendedProducts.map((product) => (
+                <ResultCard key={product.id} {...product} />
+              ))
+            ) : (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem 0' }}>
+                <p style={{ color: '#718096' }}>추천 가능한 솔루션 제품이 존재하지 않습니다.</p>
+              </div>
+            )}
+          </div>
+
+          {/* 상담 및 가입 연동 CTA 배너 */}
+          <div className="action-banner">
+            <h2 className="banner-title">전문 팀 멤버와 맞춤 헬스 컨설팅 시작하기</h2>
+            <p className="banner-desc">
+              체질 진단 결과에 따라 추가적인 복용 팁이나 구매/비즈니스 회원 혜택이 궁금하신가요? 
+              전문적인 헬스 가이드를 제공하는 시너지 코리아의 공인 멤버와 직접 연결해 보세요.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <a 
+                href="https://www.synergyworldwide.com/KR/ko-KR/member-lookup" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-secondary"
+              >
+                가까운 팀 멤버 찾기
+              </a>
+              <button 
+                onClick={handleReset}
+                className="btn-secondary" 
+                style={{ background: 'transparent', border: '2px solid #FFFFFF', color: '#FFFFFF' }}
+              >
+                다시 진단하기
+              </button>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* 푸터 */}
+      <footer style={{ 
+        marginTop: 'auto', 
+        padding: '2rem', 
+        backgroundColor: '#001E61', 
+        color: 'rgba(255,255,255,0.7)', 
+        fontSize: '0.85rem',
+        textAlign: 'center',
+        borderTop: '1px solid rgba(255,255,255,0.1)'
+      }}>
+        <p>© 2026 Synergy WorldWide Korea. All Rights Reserved. | KDSA 직접판매공제조합 가입 회원사</p>
+        <p style={{ fontSize: '0.75rem', marginTop: '0.5rem', opacity: 0.6 }}>본 웹사이트는 맞춤형 제품 추천 서비스를 시뮬레이션하기 위한 데모 플랫폼입니다.</p>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
