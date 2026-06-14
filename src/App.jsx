@@ -21,6 +21,13 @@ function App() {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [autoDetectedCount, setAutoDetectedCount] = useState(0);
 
+  // --- 유비오맥파 시뮬레이터 상태 ---
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [simStress, setSimStress] = useState(65);
+  const [simFatigue, setSimFatigue] = useState(70);
+  const [simVascular, setSimVascular] = useState(4); // 1~7단계
+  const [macpaData, setMacpaData] = useState(null); // 시뮬레이터에서 전송받은 데이터
+
   // 사용자가 직접 입력한 텍스트 기반 자연어 매핑 로직
   useEffect(() => {
     if (!inputText.trim()) {
@@ -32,17 +39,13 @@ function App() {
     const text = inputText.toLowerCase();
 
     Object.entries(NLP_DICTIONARY).forEach(([concernId, keywords]) => {
-      // 키워드 중 하나라도 포함되어 있으면 감지
       const hasKeyword = keywords.some(keyword => text.includes(keyword));
       if (hasKeyword) {
         detected.push(concernId);
       }
     });
 
-    // 기존의 수동 선택값과 자동 분석된 값을 병합 (수동 선택 보존을 위해)
-    // 여기서는 자연어 입력에 따라 실시간 반영
     setSelectedConcerns(prev => {
-      // 주관식 텍스트로 감지된 값들로 업데이트하되, 주관식이 빈칸이 아닐 때는 감지된 값 중심으로 재구성
       const merged = Array.from(new Set([...detected]));
       return merged;
     });
@@ -60,25 +63,62 @@ function App() {
   };
 
   // 맞춤 솔루션 계산 및 결과창 이동
-  const handleAnalyze = () => {
-    if (selectedConcerns.length === 0) return;
-    
+  const handleAnalyze = (macpaOverride = null) => {
     setIsAnalyzing(true);
     
     // AI 진단 분석 로딩 시뮬레이션 (1.5초)
     setTimeout(() => {
+      const concernsToUse = macpaOverride ? macpaOverride.concerns : selectedConcerns;
+      
       // 선택된 모든 고민에 연관된 고유 제품들 필터링
       const matched = PRODUCTS.filter(product => 
-        product.matchingConcerns.some(concern => selectedConcerns.includes(concern))
+        product.matchingConcerns.some(concern => concernsToUse.includes(concern))
       );
       
       setRecommendedProducts(matched);
       setIsAnalyzing(false);
       setShowResults(true);
+      if (macpaOverride) {
+        setMacpaData(macpaOverride.data);
+      }
       
       // 결과 화면으로 부드럽게 스크롤
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 1500);
+  };
+
+  // 시뮬레이터 전송 핸들러 (API Call 모사)
+  const handleSimulatorSubmit = () => {
+    setIsSimulatorOpen(false);
+    
+    // 가상 데이터 기반 매핑 로직 산정
+    const autoConcerns = [];
+    // 1. 스트레스 60% 이상 또는 피로도 60% 이상 -> fatigue
+    if (simStress >= 60 || simFatigue >= 60) {
+      autoConcerns.push('fatigue');
+    }
+    // 2. 혈관 단계가 4단계 이상 -> liver (해독 및 혈관대사 케어)
+    if (simVascular >= 4) {
+      autoConcerns.push('liver');
+    }
+    // 3. 자율신경 극도 불균형 가정 -> 장 건강(gut) 연계
+    if (simStress >= 75) {
+      autoConcerns.push('gut');
+    }
+
+    // 데이터 구조 생성
+    const resultObj = {
+      concerns: autoConcerns.length > 0 ? autoConcerns : ['fatigue'],
+      data: {
+        stress: simStress,
+        fatigue: simFatigue,
+        vascular: simVascular
+      }
+    };
+
+    // 로컬 선택 해제 및 시뮬레이터 데이터 입력 처리
+    setSelectedConcerns(resultObj.concerns);
+    handleAnalyze(resultObj);
   };
 
   // 재진단 핸들러
@@ -87,6 +127,7 @@ function App() {
     setInputText('');
     setShowResults(false);
     setRecommendedProducts([]);
+    setMacpaData(null);
   };
 
   return (
@@ -105,7 +146,16 @@ function App() {
           />
           <span className="brand-badge">WELLNESS FINDER</span>
         </div>
-        <div>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          {/* 가상 연동 모드 버튼 */}
+          {!showResults && (
+            <button 
+              className="simulator-trigger-btn"
+              onClick={() => setIsSimulatorOpen(true)}
+            >
+              🔌 유비오맥파 연동 데모
+            </button>
+          )}
           <button 
             onClick={handleReset}
             style={{ 
@@ -129,8 +179,12 @@ function App() {
       {isAnalyzing && (
         <div className="loader-container" style={{ margin: 'auto' }}>
           <div className="spinner"></div>
-          <h2 style={{ color: '#001E61', fontFamily: 'Outfit', fontWeight: '800', fontSize: '1.8rem' }}>체질 및 건강 데이터 분석 중...</h2>
-          <p style={{ color: '#555', marginTop: '0.8rem', fontSize: '1.15rem' }}>선택하신 증상에 최적화된 성분 조합을 구성하고 있습니다.</p>
+          <h2 style={{ color: '#001E61', fontFamily: 'Outfit', fontWeight: '800', fontSize: '1.8rem' }}>
+            {macpaData ? '유비오맥파 검사 결과 수신 및 분석 중...' : '체질 및 건강 데이터 분석 중...'}
+          </h2>
+          <p style={{ color: '#555', marginTop: '0.8rem', fontSize: '1.15rem' }}>
+            {macpaData ? '자율신경 및 혈관 탄성 데이터 기반 성분 조합 구성 중입니다.' : '선택하신 증상에 최적화된 성분 조합을 구성하고 있습니다.'}
+          </p>
         </div>
       )}
 
@@ -142,7 +196,7 @@ function App() {
             <h1 className="hero-title">당신의 몸에 딱 맞는<br />1:1 맞춤형 영양 시너지를 찾아보세요</h1>
             <p className="hero-subtitle">
               불편하신 점을 주관식으로 직접 적거나 아래 건강 고민 카드 중에서 선택해 보세요.
-              의·과학적 R&D를 바탕으로 검증된 영양 솔루션을 매칭해 드립니다.
+              우측 상단의 **유비오맥파 연동 데모**를 클릭하면 혈관/스트레스 검사 데이터와의 연계를 모사할 수 있습니다.
             </p>
           </section>
 
@@ -183,7 +237,7 @@ function App() {
             <div className="cta-container">
               <button 
                 className="btn-primary" 
-                onClick={handleAnalyze}
+                onClick={() => handleAnalyze()}
                 disabled={selectedConcerns.length === 0}
               >
                 <span>맞춤 영양 솔루션 분석하기</span>
@@ -202,12 +256,41 @@ function App() {
       {/* 2단계: 결과 화면 */}
       {!isAnalyzing && showResults && (
         <main className="app-container results-section">
+          {/* 유비오맥파 하드웨어 연동 데이터 배너 */}
+          {macpaData && (
+            <div className="macpa-data-panel">
+              <div className="macpa-panel-title">🔌 uBioMacpa 측정 데이터 연동 성공 (시나리오 C 시뮬레이션)</div>
+              <div className="macpa-metrics-grid">
+                <div className="macpa-metric-card">
+                  <span className="metric-label">자율신경 스트레스 지수</span>
+                  <span className="metric-value" style={{ color: macpaData.stress >= 60 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.stress}% {macpaData.stress >= 60 ? '(높음)' : '(보통)'}
+                  </span>
+                </div>
+                <div className="macpa-metric-card">
+                  <span className="metric-label">누적 피로도</span>
+                  <span className="metric-value" style={{ color: macpaData.fatigue >= 60 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.fatigue}% {macpaData.fatigue >= 60 ? '(주의)' : '(안정)'}
+                  </span>
+                </div>
+                <div className="macpa-metric-card">
+                  <span className="metric-label">말초 혈관 탄성 단계</span>
+                  <span className="metric-value" style={{ color: macpaData.vascular >= 4 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.vascular}단계 (총 7단계) {macpaData.vascular >= 4 ? '(경화 진행)' : '(양호)'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="results-header">
             <span className="hero-tag" style={{ color: '#1890FF' }}>YOUR WELLNESS COMBINATION</span>
             <h1 className="hero-title">당신만을 위한 맞춤 처방 솔루션</h1>
             <p className="hero-subtitle" style={{ maxWidth: '750px' }}>
-              선택/감지된 고민({selectedConcerns.map(c => CONCERNS.find(item => item.id === c)?.title.split(' ')[0]).join(', ')})을 케어하기 위해 
-              우선적으로 섭취가 필요한 유효 성분과 추천 제품 조합입니다.
+              {macpaData 
+                ? '유비오맥파 장치 측정 데이터 분석에 의거하여 도출된 혈행 개선 및 활력 충전 솔루션입니다.'
+                : `선택/감지된 고민(${selectedConcerns.map(c => CONCERNS.find(item => item.id === c)?.title.split(' ')[0]).join(', ')})을 케어하기 위해 우선적으로 섭취가 필요한 유효 성분과 추천 제품 조합입니다.`
+              }
             </p>
           </div>
 
@@ -249,6 +332,78 @@ function App() {
             </div>
           </div>
         </main>
+      )}
+
+      {/* --- 유비오맥파 시뮬레이터 모달 --- */}
+      {isSimulatorOpen && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <h2 className="modal-title">🔌 uBioMacpa 가상 측정 장치 시뮬레이터</h2>
+            <p className="modal-desc">
+              하드웨어 측정기가 없을 때 연동 기능을 모사하기 위한 시뮬레이터입니다.
+              지표를 설정하고 데이터를 전송해 보세요.
+            </p>
+
+            <div className="simulator-control-group">
+              <div className="control-item">
+                <div className="control-label-row">
+                  <span>자율신경 스트레스 지수</span>
+                  <span className="control-val-badge">{simStress}%</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value={simStress} 
+                  onChange={(e) => setSimStress(Number(e.target.value))} 
+                />
+              </div>
+
+              <div className="control-item">
+                <div className="control-label-row">
+                  <span>누적 피로도</span>
+                  <span className="control-val-badge">{simFatigue}%</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value={simFatigue} 
+                  onChange={(e) => setSimFatigue(Number(e.target.value))} 
+                />
+              </div>
+
+              <div className="control-item">
+                <div className="control-label-row">
+                  <span>말초 혈관 탄성 단계 (1~7단계)</span>
+                  <span className="control-val-badge">{simVascular}단계</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="1" 
+                  max="7" 
+                  value={simVascular} 
+                  onChange={(e) => setSimVascular(Number(e.target.value))} 
+                />
+              </div>
+            </div>
+
+            <div className="modal-buttons-row">
+              <button 
+                className="btn-simulator-submit"
+                onClick={handleSimulatorSubmit}
+              >
+                가상 데이터 전송 (API 연동 모사)
+              </button>
+              <button 
+                className="btn-simulator-close"
+                onClick={() => setIsSimulatorOpen(false)}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* 푸터 */}
