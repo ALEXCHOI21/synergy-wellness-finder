@@ -3,7 +3,8 @@ import { CONCERNS, PRODUCTS, PACKS } from './data/productsData';
 import Card from './components/Card';
 import ResultCard from './components/ResultCard';
 import ProgressBar from './components/ProgressBar';
-import leeYongDaeImg from './assets/lee_yong_dae.png';
+const leeYongDaeImg = 'https://postfiles.pstatic.net/MjAyMjA1MjBfMzEg/MDAxNjUzMDQ2NzQ3NDk3.g_YNZSmGTqq5wnylEmIEo1O_73dvMgt4SJmbe-8w4gEg.aV3EJhJxF2Hvaz66px7o3GtbpWBXQe8FDUf21Z4scvIg.JPEG.alsgo0330/20220517%A3%DF130402.jpg?type=w966';
+import megapackIntegratedImg from './assets/megapack_integrated.png';
 
 // 자연어 분석용 키워드 매핑 사전
 const NLP_DICTIONARY = {
@@ -336,7 +337,7 @@ function App() {
                 <div className="package-badge">🏆 최우선 추천 패키지 처방</div>
                 <div className="package-content-wrapper">
                   <div className="package-image-container">
-                    <img src={recommendedPack.imageUrl} alt={recommendedPack.name} className="package-image" />
+                    <img src={recommendedPack.id === 'megapack' ? megapackIntegratedImg : recommendedPack.imageUrl} alt={recommendedPack.name} className="package-image" />
                   </div>
                   <div className="package-text-details">
                     <h2 className="package-title">{recommendedPack.name}</h2>
@@ -373,9 +374,11 @@ function App() {
 
                     <div className="package-bottom-row">
                       <span className="package-usage-text">💡 복용법: <strong>{recommendedPack.usage}</strong></span>
-                      <a href={recommendedPack.link} target="_blank" rel="noopener noreferrer" className="package-cta-btn">
-                        공식 스토어에서 패키지 보기
-                      </a>
+                      {recommendedPack.id !== 'megapack' && (
+                        <a href={recommendedPack.link} target="_blank" rel="noopener noreferrer" className="package-cta-btn">
+                          공식 스토어에서 패키지 보기
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
