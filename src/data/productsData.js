@@ -114,7 +114,7 @@ export const PRODUCTS = [
     id: "b_prime",
     name: "비-프라임 마그네슘",
     subName: "B-Prime Magnesium",
-    tagline: "에너지 이용 및 신경 안정 기능의 마그네슘",
+    tagline: "에너지 이용과 신경 안정 기능의 마그네슘",
     imageUrl: "https://usprod.synergyworldwide.com/globalassets/synergy-products-catalog/products/kr-3045e43a2467491a891d43293a5b9b02.png?v=170625054213",
     description: "피로 해소, 신경 기능 유지 및 근육 건강에 필수적인 고흡수율 마그네슘 제제로 스트레스 해소와 숙면에 필수적인 영양제입니다.",
     ingredients: ["마그네슘", "과일 채소 혼합 분말"],
@@ -166,17 +166,17 @@ export const PACKS = [
   {
     id: "megapack",
     name: "시너지 메가팩",
-    subName: "Mega Pack (전신 디톡스 & 다이어트 올인원)",
-    tagline: "혈관 청소부터 장내 환경 리셋까지 전신 대사 케어 프로그램",
-    imageUrl: "https://usprod.synergyworldwide.com/globalassets/synergy-products-catalog/products/kr-c329dfb57e8343a8be0d5d1c874cd082.webp?v=110325013941", // 오토도어 스포츠 클라이밍 이미지 대신 원팩 이미지 기반 풀 패키지 이미지 매칭
-    description: "혈액 순환을 개선하는 프로알지-9+ 대량 공급과 더불어 고단백 식단을 채워주는 맥시멈 프로틴, 장내 환경을 정화하는 컨트롤 FOS 및 노폐물을 중화 배출하는 트루그린, 비프라임 등이 총집결한 4~6주 최고급 전신 리뉴얼 해독 프로그램입니다.",
+    subName: "Mega Pack (12주 집중 대사 케어 프로그램)",
+    tagline: "본래 1년 동안 섭취할 고기능성 영양 자산을 단 12주에 압축 주입하는 대사 세포 리부팅 솔루션",
+    imageUrl: "https://usprod.synergyworldwide.com/globalassets/synergy-products-catalog/products/kr-c329dfb57e8343a8be0d5d1c874cd082.webp?v=110325013941",
+    description: "본 메가팩은 본래 1년 동안 장기 공급하도록 구성된 고함량 영양 패키지입니다. 하지만 인체 세포 재생 주기(Turnover)인 120일(약 12주)에 맞춰 체내 영양 밀도를 임계점 이상으로 포화(Saturation)시켜 혈관의 노폐물 청소와 장 건강 회복, 대사 엔진을 완전히 깨우기 위해 12주 고농축 집중 케어 코스로 적용됩니다.",
     components: ["프로알지-9+", "시너비트", "시너뮨", "맥시멈 프로틴", "컨트롤 FOS", "트루그린", "바이타팩", "비프라임"],
     benefits: [
-      "전신 혈액 순환 개선 및 체내 축적된 노폐물/독소 집중 배출",
-      "식이섬유(FOS)와 유산균을 통한 근본적 장 건강 리부팅",
-      "근육 유실 없이 체지방 중심의 건강한 다이어트 및 기초대사량 증가"
+      "12주 세포 교체 주기에 맞춰 1년 치 영양 자산을 체내에 압축 공급하여 체질 체인징",
+      "혈행 정체 및 누적 스트레스 독소를 비워내는 전신 림프/혈관 딥 클렌징",
+      "대사 능력을 근본적으로 회복하여 붓지 않고 요요 없는 건강한 1:1 체중 조절 환경 조성"
     ],
-    usage: "전문 시너지 팀 멤버의 가이드에 따라 주차별 집중 섭취 플랜으로 수행하십시오.",
+    usage: "시너지 전문 팀 멤버의 가이드 하에 12주 집중 복용 타임테이블에 맞춰 섭취하십시오.",
     link: "https://www.synergyworldwide.com/KR/ko-KR/Shop/all-packs"
   }
 ];

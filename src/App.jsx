@@ -24,7 +24,7 @@ function App() {
 
   // --- 유비오맥파 시뮬레이터 상태 ---
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
-  const [simStress, setSimStress] = useState(50); // 기본값 조정
+  const [simStress, setSimStress] = useState(50);
   const [simFatigue, setSimFatigue] = useState(55);
   const [simVascular, setSimVascular] = useState(3);
   const [macpaData, setMacpaData] = useState(null);
@@ -78,11 +78,11 @@ function App() {
       );
       setRecommendedProducts(matched);
 
-      // 2. 패키지(원팩 / 메가팩) 분기 판단 알고리즘 (민감성 대폭 상향)
+      // 2. 패키지(원팩 / 메가팩) 분기 판단 알고리즘
       let selectedPack = null;
-      const isSevereVascular = dataToUse && dataToUse.vascular >= 4; // 3.5단계(4단계) 이상이면 즉시 혈관 위험으로 매칭
-      const isSevereStress = dataToUse && (dataToUse.stress >= 60 || dataToUse.fatigue >= 60); // 조금만 벗어나도 경고
-      const hasManyConcerns = concernsToUse.length >= 2; // 복합고민 2개 이상 시 즉시 메가팩 제안
+      const isSevereVascular = dataToUse && dataToUse.vascular >= 4;
+      const isSevereStress = dataToUse && (dataToUse.stress >= 60 || dataToUse.fatigue >= 60);
+      const hasManyConcerns = concernsToUse.length >= 2;
 
       if (hasManyConcerns || isSevereVascular || isSevereStress) {
         selectedPack = PACKS.find(p => p.id === 'megapack');
@@ -101,20 +101,17 @@ function App() {
     }, 1500);
   };
 
-  // 시뮬레이터 전송 핸들러 (민감도 대폭 상향으로 정상범위 조금만 벗어나도 카드 자동선택)
+  // 시뮬레이터 전송 핸들러
   const handleSimulatorSubmit = () => {
     setIsSimulatorOpen(false);
     
     const autoConcerns = [];
-    // 스트레스/피로도가 45% 이상인 경우 (정상 범위를 살짝 상회) -> 만성피로 자동 매핑
     if (simStress >= 45 || simFatigue >= 45) {
       autoConcerns.push('fatigue');
     }
-    // 말초 혈관 탄성 3단계 이상인 경우 (초기 경화 의심) -> 간 해독(혈액순환) 매핑
     if (simVascular >= 3) {
       autoConcerns.push('liver');
     }
-    // 스트레스 55% 이상 시 -> 장 건강 자동 매핑
     if (simStress >= 55) {
       autoConcerns.push('gut');
     }
@@ -319,6 +316,19 @@ function App() {
                     <h2 className="package-title">{recommendedPack.name}</h2>
                     <p className="package-subtitle">{recommendedPack.subName} | {recommendedPack.tagline}</p>
                     <p className="package-desc">{recommendedPack.description}</p>
+
+                    {/* 과학적 12주 세포 리셋 설득 안내 패널 추가 */}
+                    {recommendedPack.id === 'megapack' && (
+                      <div className="package-scientific-story">
+                        <div className="story-title">🧬 왜 1년 치 영양 자산을 12주에 압축하여 섭취할까요?</div>
+                        <div className="story-body">
+                          인간 몸의 적혈구 및 대사 세포가 완전히 재생(Turnover)되어 새롭게 교체되는 주기는 평균 <strong>120일(약 12주)</strong>입니다. 
+                          이 세포 리뉴얼 기간 동안 1년 치 고기능성 활성 성분을 체내에 집중적·폭발적으로 포화(Saturation)시킬 때, 
+                          정체되어 있던 혈액 순환 대사 회로가 깨어나고 혈관 노폐물이 청소되며 만성 피로와 비만 체질이 근본적으로 리부팅되는 
+                          <strong>'시너지 임계점'</strong> 효과를 달성하게 됩니다.
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="package-components">
                       <span className="component-label">📦 패키지 구성 제품:</span>

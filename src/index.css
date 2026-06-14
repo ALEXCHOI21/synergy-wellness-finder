@@ -476,6 +476,31 @@ body {
   margin-bottom: 2rem;
 }
 
+/* 12주 세포 리셋 과학적 설득 패널 스타일 */
+.package-scientific-story {
+  background-color: rgba(0, 181, 226, 0.05);
+  border: 1px dashed rgba(0, 181, 226, 0.4);
+  border-left: 5px solid var(--success-color);
+  border-radius: 16px;
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 2.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.story-title {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  color: var(--primary-color);
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+}
+
+.story-body {
+  font-size: 1.05rem;
+  color: #2D3748;
+  line-height: 1.7;
+}
+
 .package-components {
   display: flex;
   flex-wrap: wrap;
@@ -529,7 +554,7 @@ body {
   font-size: 1.25rem;
 }
 
-/* 하단 복용법 및 CTA 정렬 구조 개선 (UI 겹침 방지) */
+/* 하단 복용법 및 CTA 정렬 구조 개선 */
 .package-bottom-row {
   display: flex;
   flex-direction: row;
@@ -537,7 +562,7 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin-top: 3rem; /* 수직 격차 확보 */
+  margin-top: 3rem;
   width: 100%;
   border-top: 1px solid #E2E8F0;
   padding-top: 1.8rem;
