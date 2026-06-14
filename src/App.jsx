@@ -3,6 +3,7 @@ import { CONCERNS, PRODUCTS, PACKS } from './data/productsData';
 import Card from './components/Card';
 import ResultCard from './components/ResultCard';
 import ProgressBar from './components/ProgressBar';
+import leeYongDaeImg from './assets/lee_yong_dae.png';
 
 // 자연어 분석용 키워드 매핑 사전
 const NLP_DICTIONARY = {
@@ -214,13 +215,10 @@ function App() {
             <section className="model-banner-section">
               <div className="model-banner-card">
                 <div className="model-image-container">
-                  <img 
-                    src="https://krprod.synergyworldwide.com/contentassets/afbcab5cc5bb413faf4cfd327021ce61/image9rfv.png" 
+                                    <img 
+                    src={leeYongDaeImg} 
                     alt="배드민턴 국가대표 이용대 모델" 
                     className="model-img" 
-                    onError={(e) => {
-                      e.target.src = "https://usprod.synergyworldwide.com/globalassets/korea/banners/large-3001x1301.jpg";
-                    }}
                   />
                 </div>
                 <div className="model-quote-details">
