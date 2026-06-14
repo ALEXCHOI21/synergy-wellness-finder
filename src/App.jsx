@@ -210,8 +210,36 @@ function App() {
           </section>
 
           <main className="app-container">
+            {/* 국가대표 이용대 홍보 배너 첫 화면 추가 */}
+            <section className="model-banner-section">
+              <div className="model-banner-card">
+                <div className="model-image-container">
+                  <img 
+                    src="https://krprod.synergyworldwide.com/contentassets/afbcab5cc5bb413faf4cfd327021ce61/image9rfv.png" 
+                    alt="배드민턴 국가대표 이용대 모델" 
+                    className="model-img" 
+                    onError={(e) => {
+                      e.target.src = "https://usprod.synergyworldwide.com/globalassets/korea/banners/large-3001x1301.jpg";
+                    }}
+                  />
+                </div>
+                <div className="model-quote-details">
+                  <div className="model-badge">SYNERGY CHAMPION VALUE</div>
+                  <h2 className="model-quote-title">"프로알지는 제 최애 제품이에요.<br />중요한 시합 전에는 꼭 챙겨 먹습니다!"</h2>
+                  <div className="model-info">
+                    <span className="model-name">이용대 선수</span>
+                    <span className="model-title">| 배드민턴 올림픽 금메달리스트</span>
+                  </div>
+                  <p className="model-desc">
+                    국가대표 운동선수가 한계에 도전하고 최상의 피지컬을 관리하기 위해 선택한 영양 솔루션. 
+                    600가지 이상의 원료 테스트를 거친 과학적인 에너지 시너지를 경험해 보세요.
+                  </p>
+                </div>
+              </div>
+            </section>
+
             {/* 직접 쓰기 인풋 필드 섹션 */}
-            <div className="text-diagnosis-section">
+            <div className="text-diagnosis-section" style={{ marginTop: '3rem' }}>
               <h2 className="section-title">✍️ 어디가 어떻게 안 좋으신가요?</h2>
               <p className="section-desc">
                 예: "요즘 야근이 잦아 술도 자주 먹고 아침에 너무 피곤해요. 살도 찌는 것 같아 다이어트도 필요해요."
@@ -317,7 +345,7 @@ function App() {
                     <p className="package-subtitle">{recommendedPack.subName} | {recommendedPack.tagline}</p>
                     <p className="package-desc">{recommendedPack.description}</p>
 
-                    {/* 과학적 12주 세포 리셋 설득 안내 패널 추가 */}
+                    {/* 과학적 12주 세포 리셋 설득 안내 패널 */}
                     {recommendedPack.id === 'megapack' && (
                       <div className="package-scientific-story">
                         <div className="story-title">🧬 왜 1년 치 영양 자산을 12주에 압축하여 섭취할까요?</div>

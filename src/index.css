@@ -999,3 +999,135 @@ body {
 .btn-simulator-close:hover {
   background-color: #E2E8F0;
 }
+
+/* 홍보 모델 이용대 선수 배너 섹션 */
+.model-banner-section {
+  margin: 3.5rem 0;
+  width: 100%;
+}
+
+.model-banner-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 245, 255, 0.95));
+  border: 1px solid rgba(0, 30, 97, 0.08);
+  border-radius: 24px;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 3.5rem;
+  box-shadow: var(--shadow-premium);
+  position: relative;
+  overflow: hidden;
+}
+
+.model-banner-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 300px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 181, 226, 0.05) 0%, transparent 70%);
+  transform: rotate(-30deg);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.model-image-container {
+  flex: 0 0 320px;
+  height: 380px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 30px rgba(0, 30, 97, 0.15);
+  position: relative;
+  z-index: 2;
+  border: 4px solid #FFFFFF;
+}
+
+.model-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.model-banner-card:hover .model-img {
+  transform: scale(1.05);
+}
+
+.model-quote-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.model-badge {
+  align-self: flex-start;
+  background-color: rgba(0, 30, 97, 0.06);
+  color: var(--primary-color);
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 0.4rem 1rem;
+  border-radius: 30px;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(0, 30, 97, 0.1);
+}
+
+.model-quote-title {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.model-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  margin-top: 0.2rem;
+}
+
+.model-name {
+  color: var(--primary-color);
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.model-title {
+  color: var(--success-color);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.model-desc {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+/* 모바일 및 태블릿 반응형 대응 */
+@media (max-width: 900px) {
+  .model-banner-card {
+    flex-direction: column;
+    padding: 2.5rem;
+    gap: 2rem;
+  }
+  
+  .model-image-container {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 320px;
+  }
+  
+  .model-quote-title {
+    font-size: 1.6rem;
+  }
+}
+
