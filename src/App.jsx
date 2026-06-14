@@ -233,6 +233,14 @@ function App() {
                     국가대표 운동선수가 한계에 도전하고 최상의 피지컬을 관리하기 위해 선택한 영양 솔루션. 
                     600가지 이상의 원료 테스트를 거친 과학적인 에너지 시너지를 경험해 보세요.
                   </p>
+                  <a 
+                    href="https://krblog.synergyworldwide.com/2020/03/hot-spot.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="model-blog-link"
+                  >
+                    🔍 이용대 선수 매장 방문 스토리 (공식 블로그) →
+                  </a>
                 </div>
               </div>
             </section>

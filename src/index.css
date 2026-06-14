@@ -1131,3 +1131,27 @@ body {
   }
 }
 
+
+/* 이용대 선수 공식 블로그 스토리 링크 스타일 */
+.model-blog-link {
+  display: inline-block;
+  align-self: flex-start;
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(24, 144, 255, 0.25);
+  border-radius: 8px;
+  background-color: rgba(24, 144, 255, 0.03);
+  transition: var(--transition-smooth);
+}
+
+.model-blog-link:hover {
+  background-color: var(--accent-color);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+  transform: translateX(4px);
+  border-color: var(--accent-color);
+}
