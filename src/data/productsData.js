@@ -114,7 +114,7 @@ export const PRODUCTS = [
     id: "b_prime",
     name: "비-프라임 마그네슘",
     subName: "B-Prime Magnesium",
-    tagline: "에너지 이용과 신경 안정 기능의 마그네슘",
+    tagline: "에너지 이용 및 신경 안정 기능의 마그네슘",
     imageUrl: "https://usprod.synergyworldwide.com/globalassets/synergy-products-catalog/products/kr-3045e43a2467491a891d43293a5b9b02.png?v=170625054213",
     description: "피로 해소, 신경 기능 유지 및 근육 건강에 필수적인 고흡수율 마그네슘 제제로 스트레스 해소와 숙면에 필수적인 영양제입니다.",
     ingredients: ["마그네슘", "과일 채소 혼합 분말"],
@@ -168,7 +168,7 @@ export const PACKS = [
     name: "시너지 메가팩",
     subName: "Mega Pack (전신 디톡스 & 다이어트 올인원)",
     tagline: "혈관 청소부터 장내 환경 리셋까지 전신 대사 케어 프로그램",
-    imageUrl: "https://usprod.synergyworldwide.com/globalassets/allproducts.jpg",
+    imageUrl: "https://usprod.synergyworldwide.com/globalassets/synergy-products-catalog/products/kr-c329dfb57e8343a8be0d5d1c874cd082.webp?v=110325013941", // 오토도어 스포츠 클라이밍 이미지 대신 원팩 이미지 기반 풀 패키지 이미지 매칭
     description: "혈액 순환을 개선하는 프로알지-9+ 대량 공급과 더불어 고단백 식단을 채워주는 맥시멈 프로틴, 장내 환경을 정화하는 컨트롤 FOS 및 노폐물을 중화 배출하는 트루그린, 비프라임 등이 총집결한 4~6주 최고급 전신 리뉴얼 해독 프로그램입니다.",
     components: ["프로알지-9+", "시너비트", "시너뮨", "맥시멈 프로틴", "컨트롤 FOS", "트루그린", "바이타팩", "비프라임"],
     benefits: [

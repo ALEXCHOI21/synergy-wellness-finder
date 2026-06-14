@@ -24,10 +24,10 @@ function App() {
 
   // --- 유비오맥파 시뮬레이터 상태 ---
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
-  const [simStress, setSimStress] = useState(65);
-  const [simFatigue, setSimFatigue] = useState(70);
-  const [simVascular, setSimVascular] = useState(4); // 1~7단계
-  const [macpaData, setMacpaData] = useState(null); // 시뮬레이터에서 전송받은 데이터
+  const [simStress, setSimStress] = useState(50); // 기본값 조정
+  const [simFatigue, setSimFatigue] = useState(55);
+  const [simVascular, setSimVascular] = useState(3);
+  const [macpaData, setMacpaData] = useState(null);
 
   // 사용자가 직접 입력한 텍스트 기반 자연어 매핑 로직
   useEffect(() => {
@@ -78,17 +78,15 @@ function App() {
       );
       setRecommendedProducts(matched);
 
-      // 2. 패키지(원팩 / 메가팩) 분기 판단 알고리즘
+      // 2. 패키지(원팩 / 메가팩) 분기 판단 알고리즘 (민감성 대폭 상향)
       let selectedPack = null;
-      const isSevereVascular = dataToUse && dataToUse.vascular >= 5;
-      const isSevereStress = dataToUse && (dataToUse.stress >= 75 || dataToUse.fatigue >= 75);
-      const hasManyConcerns = concernsToUse.length >= 3;
+      const isSevereVascular = dataToUse && dataToUse.vascular >= 4; // 3.5단계(4단계) 이상이면 즉시 혈관 위험으로 매칭
+      const isSevereStress = dataToUse && (dataToUse.stress >= 60 || dataToUse.fatigue >= 60); // 조금만 벗어나도 경고
+      const hasManyConcerns = concernsToUse.length >= 2; // 복합고민 2개 이상 시 즉시 메가팩 제안
 
-      // 고민이 3개 이상이거나, 기기 데이터 수치가 심각(스트레스 75% 이상, 혈관 5단계 이상)인 경우 메가팩 추천
       if (hasManyConcerns || isSevereVascular || isSevereStress) {
         selectedPack = PACKS.find(p => p.id === 'megapack');
       } else {
-        // 그 외에는 원팩 기본 제안
         selectedPack = PACKS.find(p => p.id === 'onepack');
       }
       setRecommendedPack(selectedPack);
@@ -99,23 +97,25 @@ function App() {
         setMacpaData(dataToUse);
       }
       
-      // 결과 화면으로 부드럽게 스크롤
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 1500);
   };
 
-  // 시뮬레이터 전송 핸들러 (API Call 모사)
+  // 시뮬레이터 전송 핸들러 (민감도 대폭 상향으로 정상범위 조금만 벗어나도 카드 자동선택)
   const handleSimulatorSubmit = () => {
     setIsSimulatorOpen(false);
     
     const autoConcerns = [];
-    if (simStress >= 60 || simFatigue >= 60) {
+    // 스트레스/피로도가 45% 이상인 경우 (정상 범위를 살짝 상회) -> 만성피로 자동 매핑
+    if (simStress >= 45 || simFatigue >= 45) {
       autoConcerns.push('fatigue');
     }
-    if (simVascular >= 4) {
+    // 말초 혈관 탄성 3단계 이상인 경우 (초기 경화 의심) -> 간 해독(혈액순환) 매핑
+    if (simVascular >= 3) {
       autoConcerns.push('liver');
     }
-    if (simStress >= 75) {
+    // 스트레스 55% 이상 시 -> 장 건강 자동 매핑
+    if (simStress >= 55) {
       autoConcerns.push('gut');
     }
 
@@ -275,20 +275,20 @@ function App() {
               <div className="macpa-metrics-grid">
                 <div className="macpa-metric-card">
                   <span className="metric-label">자율신경 스트레스 지수</span>
-                  <span className="metric-value" style={{ color: macpaData.stress >= 75 ? '#E53E3E' : '#2B6CB0' }}>
-                    {macpaData.stress}% {macpaData.stress >= 75 ? '(경고)' : (macpaData.stress >= 60 ? '(주의)' : '(보통)')}
+                  <span className="metric-value" style={{ color: macpaData.stress >= 60 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.stress}% {macpaData.stress >= 60 ? '(위험)' : (macpaData.stress >= 45 ? '(주의)' : '(안정)')}
                   </span>
                 </div>
                 <div className="macpa-metric-card">
                   <span className="metric-label">누적 피로도</span>
-                  <span className="metric-value" style={{ color: macpaData.fatigue >= 70 ? '#E53E3E' : '#2B6CB0' }}>
-                    {macpaData.fatigue}% {macpaData.fatigue >= 70 ? '(경고)' : '(안정)'}
+                  <span className="metric-value" style={{ color: macpaData.fatigue >= 60 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.fatigue}% {macpaData.fatigue >= 60 ? '(위험)' : (macpaData.fatigue >= 45 ? '(주의)' : '(안정)')}
                   </span>
                 </div>
                 <div className="macpa-metric-card">
                   <span className="metric-label">말초 혈관 탄성 단계</span>
-                  <span className="metric-value" style={{ color: macpaData.vascular >= 5 ? '#E53E3E' : '#2B6CB0' }}>
-                    {macpaData.vascular}단계 (총 7단계) {macpaData.vascular >= 5 ? '(위험)' : (macpaData.vascular >= 4 ? '(경화)' : '(양호)')}
+                  <span className="metric-value" style={{ color: macpaData.vascular >= 4 ? '#E53E3E' : '#2B6CB0' }}>
+                    {macpaData.vascular}단계 (총 7단계) {macpaData.vascular >= 4 ? '(위험)' : (macpaData.vascular >= 3 ? '(주의)' : '(양호)')}
                   </span>
                 </div>
               </div>
@@ -335,8 +335,8 @@ function App() {
                       ))}
                     </ul>
 
-                    <div className="package-bottom-row" style={{ marginTop: '2rem' }}>
-                      <span style={{ fontSize: '1rem', color: '#666' }}>💡 복용법: <strong>{recommendedPack.usage}</strong></span>
+                    <div className="package-bottom-row">
+                      <span className="package-usage-text">💡 복용법: <strong>{recommendedPack.usage}</strong></span>
                       <a href={recommendedPack.link} target="_blank" rel="noopener noreferrer" className="package-cta-btn">
                         공식 스토어에서 패키지 보기
                       </a>

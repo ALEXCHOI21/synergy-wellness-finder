@@ -6,7 +6,7 @@
   --accent-color: #1890FF;          /* 테크니컬 블루 */
   --accent-glow: rgba(24, 144, 255, 0.4);
   --success-color: #00B5E2;         /* 시너지 서브 청록색 */
-  --gold-glow: linear-gradient(135deg, #FFD700, #FFA500); /* 프리미엄 골드 포인트 */
+  --gold-glow: linear-gradient(135deg, #FFD700, #FFA500);
   --text-main: #1A1A1A;             /* 다크 차콜 */
   --text-muted: #555555;
   --bg-main: #F8F9FB;               /* 소프트 라이트 그레이 */
@@ -392,7 +392,7 @@ body {
 
 .package-card-premium:hover {
   transform: translateY(-5px);
-  border-color: #FFA500; /* 골드 액센트 */
+  border-color: #FFA500;
   box-shadow: var(--shadow-gold);
 }
 
@@ -451,11 +451,12 @@ body {
 
 .package-text-details {
   flex-grow: 1;
+  width: 100%;
 }
 
 .package-title {
   font-family: var(--font-title);
-  font-size: 2rem;
+  font-size: 2.1rem;
   color: var(--primary-color);
   font-weight: 850;
   margin-bottom: 0.5rem;
@@ -523,9 +524,31 @@ body {
   content: '✓';
   position: absolute;
   left: 0;
-  color: #FF8C00; /* 오렌지/골드 포인트 */
+  color: #FF8C00;
   font-weight: 900;
   font-size: 1.25rem;
+}
+
+/* 하단 복용법 및 CTA 정렬 구조 개선 (UI 겹침 방지) */
+.package-bottom-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 3rem; /* 수직 격차 확보 */
+  width: 100%;
+  border-top: 1px solid #E2E8F0;
+  padding-top: 1.8rem;
+}
+
+.package-usage-text {
+  font-size: 1.05rem;
+  color: #555;
+  flex: 1;
+  min-width: 250px;
+  line-height: 1.6;
 }
 
 .package-cta-btn {
@@ -539,6 +562,7 @@ body {
   display: inline-block;
   transition: var(--transition-smooth);
   box-shadow: 0 4px 15px rgba(255, 140, 0, 0.2);
+  white-space: nowrap;
 }
 
 .package-cta-btn:hover {
