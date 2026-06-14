@@ -3,7 +3,7 @@ import { CONCERNS, PRODUCTS, PACKS } from './data/productsData';
 import Card from './components/Card';
 import ResultCard from './components/ResultCard';
 import ProgressBar from './components/ProgressBar';
-const leeYongDaeImg = 'https://postfiles.pstatic.net/MjAyMjA1MjBfMzEg/MDAxNjUzMDQ2NzQ3NDk3.g_YNZSmGTqq5wnylEmIEo1O_73dvMgt4SJmbe-8w4gEg.aV3EJhJxF2Hvaz66px7o3GtbpWBXQe8FDUf21Z4scvIg.JPEG.alsgo0330/20220517%A3%DF130402.jpg?type=w966';
+import leeYongDaeImg from './assets/lee_yong_dae_poster.jpg';
 import megapackIntegratedImg from './assets/megapack_integrated.png';
 
 // 자연어 분석용 키워드 매핑 사전
