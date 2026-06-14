@@ -3,7 +3,7 @@ import { CONCERNS, PRODUCTS, PACKS } from './data/productsData';
 import Card from './components/Card';
 import ResultCard from './components/ResultCard';
 import ProgressBar from './components/ProgressBar';
-import leeYongDaeImg from './assets/lee_yong_dae_poster.jpg';
+import leeYongDaeImg from './assets/lee_yong_dae_hotspot.jpg';
 import megapackIntegratedImg from './assets/megapack_integrated.png';
 
 // 자연어 분석용 키워드 매핑 사전
